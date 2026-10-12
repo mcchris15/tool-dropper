@@ -1,0 +1,47 @@
+1\16 drill: -11.0586
+
+1\4 drill: -10.8618
+
+3/8 drill: -11.0226
+
+1/2 drill: -10.9890
+
+3/4 drill: -10.6920
+
+3.5mm drill: -11.0586
+
+5mm drill: -10.9750
+
+7mm drill: -11.1436
+
+8mm drill: -11.1000
+
+10mm drill: -11.1698
+
+20mm drill: -11.0826
+
+35mm drill: -11.4586
+
+3/16 O Flute: -11.6090
+
+3\8 O Flute: -11.3640
+
+45 Deg: -10.5840
+
+1/4 Round: -11.8512
+
+25mm PCD: -11.1908
+
+3/8 Diamond: 
+
+1" Diamond: -11.0170
+
+V Groover: -11.3774
+
+1/4 Spiral Down: 
+
+1/8 Spiral Down: -11.6308
+
+1/16 Spiral Down: -11.3574
+
+
