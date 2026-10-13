@@ -8,4 +8,6 @@ File must be named `tool_heights.txt` and placed in the same directory as `tool-
 Tool list must be formatted as follows:  
 _First Tool Name_: ##.####  
 _Second Tool Name_: ##.####  
-_etc..._
+_etc..._  
+
+Sample `tool_heights.txt` provided for testing.
