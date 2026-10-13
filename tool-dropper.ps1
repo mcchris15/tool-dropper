@@ -21,7 +21,7 @@ if($runPrompt -eq "Y" -or $runPrompt -eq "y") {
         }	
     }
     $newLines | Set-Content $filePath
-    Write-Host -Separator "`n" "`nNew numbers:`n" $newLines
+    Write-Host -Separator "`n" "New numbers:`n" $newLines
     Read-Host -Prompt "Tool heights dropped successfully. Press enter to exit"
 } else {
     exit
