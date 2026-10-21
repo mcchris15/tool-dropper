@@ -1,4 +1,3 @@
-
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
@@ -61,6 +60,8 @@ $dropbutton.Add_Click({
     Get-Process -Name "notepad" -ErrorAction SilentlyContinue | 
         Where-Object { $_.MainWindowTitle -eq "tool_heights - Notepad" } | 
         Stop-Process -Force
+    
+    Invoke-Item "C:\Users\Northwood\Desktop\Tool Heights\tool_heights.txt"
 })
 $form.Controls.Add($dropButton)
 
@@ -98,6 +99,8 @@ $clearbutton.Add_Click({
     Get-Process -Name "notepad" -ErrorAction SilentlyContinue | 
         Where-Object { $_.MainWindowTitle -eq "tool_heights - Notepad" } | 
         Stop-Process -Force
+
+    Invoke-Item "C:\Users\Northwood\Desktop\Tool Heights\tool_heights.txt"
 })
 $form.Controls.Add($clearButton)
 
