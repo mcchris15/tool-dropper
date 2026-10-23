@@ -10,26 +10,35 @@ $lines = Get-Content $filePath
 
 # Create the main window frame
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "Tool Dropper"
-$form.Size = New-Object System.Drawing.Size(300,200)
+$form.Text = "Tool Tracker"
+$form.Size = New-Object System.Drawing.Size(900,570)
 $form.StartPosition = "CenterScreen"
-$form.Topmost = $true
 
 # Add a descriptive label
 $label = New-Object System.Windows.Forms.Label
-$label.Location = New-Object System.Drawing.Point(10,20)
-$label.Size = New-Object System.Drawing.Size(280,40)
+$label.Size = New-Object System.Drawing.Size(0,0)
 $label.Text = "Edits the values in tool_heights.txt. You may drop current numbers by 0.03 or clear all numbers from file."
 $form.Controls.Add($label)
 
+$heightsDisplay = New-Object System.Windows.Forms.TextBox
+$heightsDisplay.ReadOnly = $true
+$heightsDisplay.Text = $lines -join "`r`n"
+$heightsDisplay.Multiline = $true
+$heightsDisplay.ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
+$heightsDisplay.Location = New-Object System.Drawing.Point(10,20)
+$heightsDisplay.Size = New-Object System.Drawing.Size(860,451)
+$form.Controls.Add($heightsDisplay)
+$form.ActiveControl = $label
+
 # Add button for decreasing values
 $dropButton = New-Object System.Windows.Forms.Button
-$dropButton.Location = New-Object System.Drawing.Point(10,90)
+$dropButton.Location = New-Object System.Drawing.Point(10,501)
 $dropButton.Size = New-Object System.Drawing.Size(90,23)
-$dropButton.Text = "Drop Numbers"
+$dropButton.Text = "-0.03"
 $dropbutton.Add_Click({
     # Create backup of original file
     Copy-Item -Path $filePath -Destination $backupPath -Force
+    $lines = Get-Content $filePath
     # for loop that reads each line, edits it if need be, and adds it to newLines variable
     $newLines = foreach($line in $lines){
         # If a number matching the pattern "##.####" is found in the string, operate on it
@@ -51,28 +60,53 @@ $dropbutton.Add_Click({
     }
     # Write content from newLines variable to the original file
     $newLines | Set-Content $filePath
-    
-    $label.Text = "Numbers successfully dropped! Backup created in case this was a mistake. You may now close this window."
-    $dropButton.Enabled = $false
-    $clearButton.Enabled = $false
-    $quitButton.Enabled = $false
-
-    Get-Process -Name "notepad" -ErrorAction SilentlyContinue | 
-        Where-Object { $_.MainWindowTitle -eq "tool_heights - Notepad" } | 
-        Stop-Process -Force
-    
-    Invoke-Item "C:\Users\Northwood\Desktop\Tool Heights\tool_heights.txt"
+    $heightsDisplay.Text = $newLines -join "`r`n"
 })
 $form.Controls.Add($dropButton)
 
+# Add button for raising values
+$raiseButton = New-Object System.Windows.Forms.Button
+$raiseButton.Location = New-Object System.Drawing.Point(10,476)
+$raiseButton.Size = New-Object System.Drawing.Size(90,23)
+$raiseButton.Text = "+0.03"
+$raiseButton.Add_Click({
+    # Create backup of original file
+    Copy-Item -Path $filePath -Destination $backupPath -Force
+    $lines = Get-Content $filePath
+    # for loop that reads each line, edits it if need be, and adds it to newLines variable
+    $newLines = foreach($line in $lines){
+        # If a number matching the pattern "##.####" is found in the string, operate on it
+        if ($line -match "-\d+\.\d{4}"){
+            # Convert string a double and add 0.03
+            $newNumber = [double]$Matches[0] + 0.03
+            # Convert double back to a string
+            $newNumber = [string]$newNumber
+            # Converting to double truncates trailing 0s; check if number still matches pattern "##.####" and if not, append 0s until it does  
+            while ($newNumber -notmatch "-\d+\.\d{4}"){
+                $newNumber += "0"
+            }
+            # Replace the number string on the original line with the number string stored in newNumber
+            $line -replace "-\d+\.\d+",$newNumber
+        } else{
+            # If the current line doesn't contain a number matching the pattern, leave it alone
+            $line
+        }	
+    }
+    # Write content from newLines variable to the original file
+    $newLines | Set-Content $filePath
+    $heightsDisplay.Text = $newLines -join "`r`n"
+})
+$form.Controls.Add($raiseButton)
+
 # Add button for clearing values
 $clearButton = New-Object System.Windows.Forms.Button
-$clearButton.Location = New-Object System.Drawing.Point(100,90)
+$clearButton.Location = New-Object System.Drawing.Point(105,476)
 $clearButton.Size = New-Object System.Drawing.Size(90,23)
 $clearButton.Text = "Clear Numbers"
 $clearbutton.Add_Click({
     # Create backup of original file
     Copy-Item -Path $filePath -Destination $backupPath -Force
+    $lines = Get-Content $filePath
     # for loop that reads each line, edits it if need be, and adds it to newLines variable
     $newLines = foreach($line in $lines){
             # If a number matching the pattern "##.####" is found in the string, operate on it
@@ -89,28 +123,25 @@ $clearbutton.Add_Click({
 
     # Write content from newLines variable to the original file
     $newLines | Set-Content $filePath
-    
-    $label.Text = "Numbers successfully cleared! Backup created in case this was a mistake. You may now close this window."
-    $dropButton.Enabled = $false
-    $clearButton.Enabled = $false
-    $quitButton.Enabled = $false
-
-    # Find Notepad processes where the window title matches the exact file name
-    Get-Process -Name "notepad" -ErrorAction SilentlyContinue | 
-        Where-Object { $_.MainWindowTitle -eq "tool_heights - Notepad" } | 
-        Stop-Process -Force
-
-    Invoke-Item "C:\Users\Northwood\Desktop\Tool Heights\tool_heights.txt"
+    $heightsDisplay.Text = $newLines -join "`r`n"
+    $undoButton.Enabled = $true
 })
 $form.Controls.Add($clearButton)
 
-# Add button for quitting
-$quitButton = New-Object System.Windows.Forms.Button
-$quitButton.Location = New-Object System.Drawing.Point(190,90)
-$quitButton.Size = New-Object System.Drawing.Size(90,23)
-$quitButton.Text = "Cancel"
-$quitbutton.Add_Click({$form.Close()})
-$form.Controls.Add($quitButton)
+# Add button for undo last operation
+$undoButton = New-Object System.Windows.Forms.Button
+$undoButton.Location = New-Object System.Drawing.Point(105,501)
+$undoButton.Size = New-Object System.Drawing.Size(90,23)
+$undoButton.Text = "Undo Clear"
+$undoButton.Enabled = $false
+$undoButton.Add_Click({
+    $lines = Get-Content $backupPath
+    $lines | Set-Content $filePath
+    $heightsDisplay.Text = $lines -join "`r`n"
+    $undoButton.Enabled = $false
+    $form.ActiveControl = $label
+})
+$form.Controls.Add($undoButton)
 
 # Display the window and capture output
 $result = $form.ShowDialog()
