@@ -143,7 +143,6 @@ $editButton.Size = New-Object System.Drawing.Size(90,23)
 $editButton. Text = "Edit Values"
 $editButton.Add_Click({
     $heightsDisplay.ReadOnly = $false
-    $editButton.Enabled = $false
     $saveButton.Enabled = $true
     $form.ActiveControl = $label
 })
