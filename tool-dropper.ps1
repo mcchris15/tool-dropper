@@ -2,9 +2,9 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 # filePath variable stores the path for the file to be edited
-$filePath = "tool_heights.txt"
+$filePath = "tool_heights.tt"
 # backupPath variable  stores the path for the backup file to be created
-$backupPath = "tool_heights_backup.txt"
+$backupPath = "tool_heights.bak"
 # lines variable contains a list of all lines readfrom the file
 $lines = Get-Content $filePath
 
@@ -100,9 +100,9 @@ $form.Controls.Add($raiseButton)
 
 # Add button for clearing values
 $clearButton = New-Object System.Windows.Forms.Button
-$clearButton.Location = New-Object System.Drawing.Point(105,476)
+$clearButton.Location = New-Object System.Drawing.Point(105,501)
 $clearButton.Size = New-Object System.Drawing.Size(90,23)
-$clearButton.Text = "Clear Numbers"
+$clearButton.Text = "Clear Values"
 $clearbutton.Add_Click({
     # Create backup of original file
     Copy-Item -Path $filePath -Destination $backupPath -Force
@@ -125,23 +125,50 @@ $clearbutton.Add_Click({
     $newLines | Set-Content $filePath
     $heightsDisplay.Text = $newLines -join "`r`n"
     $undoButton.Enabled = $true
+    $clearButton.Enabled = $false
 })
 $form.Controls.Add($clearButton)
 
 # Add button for undo last operation
 $undoButton = New-Object System.Windows.Forms.Button
-$undoButton.Location = New-Object System.Drawing.Point(105,501)
+$undoButton.Location = New-Object System.Drawing.Point(200,501)
 $undoButton.Size = New-Object System.Drawing.Size(90,23)
-$undoButton.Text = "Undo Clear"
+$undoButton.Text = "Undo"
 $undoButton.Enabled = $false
 $undoButton.Add_Click({
     $lines = Get-Content $backupPath
     $lines | Set-Content $filePath
     $heightsDisplay.Text = $lines -join "`r`n"
     $undoButton.Enabled = $false
+    $clearButton.Enabled = $true
+    $editButton.Enabled = $true
     $form.ActiveControl = $label
 })
 $form.Controls.Add($undoButton)
 
+$editButton = New-Object System.Windows.Forms.Button
+$editButton.Location = New-Object System.Drawing.Point(105,476)
+$editButton.Size = New-Object System.Drawing.Size(90,23)
+$editButton. Text = "Edit Values"
+$editButton.Add_Click({
+    $heightsDisplay.ReadOnly = $false
+    $editButton.Enabled = $false
+    $saveButton.Enabled = $true
+})
+$form.Controls.Add($editButton)
+
+$saveButton = New-Object System.Windows.Forms.Button
+$saveButton.Enabled = $false
+$saveButton.Text = "Save Edit"
+$saveButton.Size = New-Object System.Drawing.Size(90,23)
+$saveButton.Location = New-Object System.Drawing.Point(200,476)
+$saveButton.Add_Click({
+    Copy-Item -Path $filePath -Destination $backupPath -Force
+    $heightsDisplay.ReadOnly = $true
+    $saveButton.Enabled = $false
+    $undoButton.Enabled = $true
+    $heightsDisplay.Text | Set-Content $filePath
+})
+$form.Controls.Add($saveButton)
 # Display the window and capture output
 $result = $form.ShowDialog()
