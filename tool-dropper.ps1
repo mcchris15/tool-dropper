@@ -36,9 +36,7 @@ $dropButton.Location = New-Object System.Drawing.Point(10,501)
 $dropButton.Size = New-Object System.Drawing.Size(90,23)
 $dropButton.Text = "-0.03"
 $dropbutton.Add_Click({
-    # Create backup of original file
-    Copy-Item -Path $filePath -Destination $backupPath -Force
-    $lines = Get-Content $filePath
+    $lines = $heightsDisplay.Text -split "\r?\n"
     # for loop that reads each line, edits it if need be, and adds it to newLines variable
     $newLines = foreach($line in $lines){
         # If a number matching the pattern "##.####" is found in the string, operate on it
@@ -58,9 +56,8 @@ $dropbutton.Add_Click({
             $line
         }	
     }
-    # Write content from newLines variable to the original file
-    $newLines | Set-Content $filePath
     $heightsDisplay.Text = $newLines -join "`r`n"
+    $saveButton.Enabled = $true
 })
 $form.Controls.Add($dropButton)
 
@@ -70,9 +67,7 @@ $raiseButton.Location = New-Object System.Drawing.Point(10,476)
 $raiseButton.Size = New-Object System.Drawing.Size(90,23)
 $raiseButton.Text = "+0.03"
 $raiseButton.Add_Click({
-    # Create backup of original file
-    Copy-Item -Path $filePath -Destination $backupPath -Force
-    $lines = Get-Content $filePath
+    $lines = $heightsDisplay.Text -split "\r?\n"
     # for loop that reads each line, edits it if need be, and adds it to newLines variable
     $newLines = foreach($line in $lines){
         # If a number matching the pattern "##.####" is found in the string, operate on it
@@ -92,9 +87,8 @@ $raiseButton.Add_Click({
             $line
         }	
     }
-    # Write content from newLines variable to the original file
-    $newLines | Set-Content $filePath
     $heightsDisplay.Text = $newLines -join "`r`n"
+    $saveButton.Enabled = $true
 })
 $form.Controls.Add($raiseButton)
 
@@ -104,9 +98,7 @@ $clearButton.Location = New-Object System.Drawing.Point(105,501)
 $clearButton.Size = New-Object System.Drawing.Size(90,23)
 $clearButton.Text = "Clear Values"
 $clearbutton.Add_Click({
-    # Create backup of original file
-    Copy-Item -Path $filePath -Destination $backupPath -Force
-    $lines = Get-Content $filePath
+    $lines = $heightsDisplay.Text -split "\r?\n"
     # for loop that reads each line, edits it if need be, and adds it to newLines variable
     $newLines = foreach($line in $lines){
             # If a number matching the pattern "##.####" is found in the string, operate on it
@@ -121,11 +113,10 @@ $clearbutton.Add_Click({
             }	
         }
 
-    # Write content from newLines variable to the original file
-    $newLines | Set-Content $filePath
     $heightsDisplay.Text = $newLines -join "`r`n"
-    $undoButton.Enabled = $true
+    $saveButton.Enabled = $true
     $clearButton.Enabled = $false
+    $form.ActiveControl = $label
 })
 $form.Controls.Add($clearButton)
 
@@ -154,12 +145,13 @@ $editButton.Add_Click({
     $heightsDisplay.ReadOnly = $false
     $editButton.Enabled = $false
     $saveButton.Enabled = $true
+    $form.ActiveControl = $label
 })
 $form.Controls.Add($editButton)
 
 $saveButton = New-Object System.Windows.Forms.Button
 $saveButton.Enabled = $false
-$saveButton.Text = "Save Edit"
+$saveButton.Text = "Save"
 $saveButton.Size = New-Object System.Drawing.Size(90,23)
 $saveButton.Location = New-Object System.Drawing.Point(200,476)
 $saveButton.Add_Click({
@@ -168,6 +160,7 @@ $saveButton.Add_Click({
     $saveButton.Enabled = $false
     $undoButton.Enabled = $true
     $heightsDisplay.Text | Set-Content $filePath
+    $form.ActiveControl = $label
 })
 $form.Controls.Add($saveButton)
 # Display the window and capture output
